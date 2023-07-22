@@ -1,1 +1,1 @@
-export {plunk} from './array/plunk'
+export { simplyGantt } from './simply-gantt/simply-gantt'
