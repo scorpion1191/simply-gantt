@@ -14,6 +14,8 @@ export const simplyGantt = (selector) => {
         customElement.setAttribute("id", ganttElement);
         element.appendChild(customElement);
         customElements.define(ganttElement, SimplyGanttComponent);
+        var chart = <SimplyGanttComponent>document.querySelector("#"+ganttElement);
+        chart.layout = visualizationConfig?.layout ? visualizationConfig?.layout : 'day'
         updateVisualizationData(visualizationConfig?.data);
     }  
      

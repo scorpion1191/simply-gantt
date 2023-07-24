@@ -42,7 +42,7 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       transform: translateX(-9999px);
     }
 
-    #select-level{
+    #select-layout{
       text-align: left;
       margin-top: 10px;
     }
@@ -56,9 +56,9 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
     </style>
 
     <div id="gantt-settings">
-      <select name="select-level" id="select-level">
-        <option value="year-month">Month / Day</option>
-        <option value="day">Day / Time</option>
+      <select name="select-layout" id="select-layout">
+        <option value="month">Month</option>
+        <option value="day">Day</option>
       </select>
 
       <fieldset id="select-from">
@@ -78,19 +78,19 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
   ;
 
   export class SimplyGanttComponent extends HTMLElement {
-    levelSelect: any;
+    layoutSelect: any;
 
     constructor() {
       super();
 
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
-
-      this.levelSelect = this.shadowRoot.querySelector('#select-level');
+      this.layoutSelect = this.shadowRoot.querySelector('#select-layout');
     }
 
     _tasks = [];
     _activities = [];
+    _layout;
     _renderer;
 
     set tasks(list){
@@ -113,11 +113,16 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
     get activities(){
       return this._activities;
     }
-    get level() {
-      return this.levelSelect.value;
+    get layout() {
+      this.layoutSelect.value = this._layout;
+      return this.layoutSelect.value;
     }
-    set level(newValue) {
-      this.levelSelect.value = newValue;
+    set layout(newValue) {
+      this.layoutSelect.value = newValue;
+      this._layout = newValue;
+      if(this.renderer){
+        this.renderer.layout =  this._layout;
+      }
     } 
     get renderer(){
       return this._renderer;
@@ -126,27 +131,32 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       this._renderer = r;
     }
     connectedCallback() {
-      this.changeLevel = this.changeLevel.bind(this);
-      this.levelSelect.addEventListener('change', this.changeLevel);
-      this.level = "year-month";   
-      this.renderer = new YearMonthRenderer(this.shadowRoot);
+      this.changeLayout = this.changeLayout.bind(this);
+      this.layoutSelect.addEventListener('change', this.changeLayout);
+      if(this.layout == "month"){
+        this.renderer = new YearMonthRenderer(this.shadowRoot);
+      }else{
+        this.renderer = new DateTimeRenderer(this.shadowRoot);
+      } 
       this.renderer.dateFrom = new Date(2021,5,1);
       this.renderer.dateTo = new Date(2021,5,24);
       this.renderer.render();
     }
 
     disconnectedCallback() {
-      if(this.levelSelect)
-        this.levelSelect.removeEventListener('change', this.changeLevel);
+      if(this.layoutSelect)
+        this.layoutSelect.removeEventListener('change', this.changeLayout);
       if(this.renderer)
         this.renderer.clear();
     }
-    changeLevel(){
+    changeLayout(){
       if(this.renderer){
         this.renderer.clear();
       }
       var r;
-      if(this.level == "year-month"){
+      console.log(this.layoutSelect.value)
+      this.layout = this.layoutSelect.value;
+      if(this.layout == "month"){
         r = new YearMonthRenderer(this.shadowRoot);
       }else{
         r = new DateTimeRenderer(this.shadowRoot);

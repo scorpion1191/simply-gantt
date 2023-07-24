@@ -386,7 +386,7 @@ export function YearMonthRenderer(root){
               var activityElement = <GanttActivity>document.createElement("gantt-activity");
               activityElement.id = activity.id;
               activityElement.activity = activity;
-              activityElement.level = "year-month";
+              activityElement.layout = "month";
 
               ganttElement.appendChild(activityElement);
 

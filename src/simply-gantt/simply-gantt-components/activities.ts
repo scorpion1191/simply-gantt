@@ -34,7 +34,7 @@ export default class GanttActivity extends HTMLElement {
   }
 
   _activity;
-  _level = "year-month";
+  _layout = "month";
 
   connectedCallback() {
       var activityElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
@@ -52,9 +52,9 @@ export default class GanttActivity extends HTMLElement {
   _render(){
     var jobElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
     var d;
-    if(this._level == "year-month"){
+    if(this._layout == "month"){
       d = this._dayDiff(this.activity.start, this.activity.end);
-    }else{//level = "day"
+    }else{//layout = "day"
       d = this._hourDiff(this.activity.start, this.activity.end);
     }
     jobElement.style.width = `calc(${d*100}% + ${d}px)`;
@@ -94,12 +94,12 @@ export default class GanttActivity extends HTMLElement {
       return this._activity;
   }
 
-  set level(newValue){
-    this._level = newValue;
+  set layout(newValue){
+    this._layout = newValue;
   }
 
-  get level(){
-      return this._level;
+  get layout(){
+      return this._layout;
   }
 }
 

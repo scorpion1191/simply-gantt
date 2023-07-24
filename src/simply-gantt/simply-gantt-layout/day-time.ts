@@ -142,7 +142,7 @@ export function DateTimeRenderer(root){
 
             for(var h = 0; h<24; h++){
                 
-              var period = document.createElement("div");
+              var period = <HTMLElement>document.createElement("div");
               period.className = "gantt-row-period";
               period.style.borderTop = "none";
               period.innerHTML = h;
@@ -313,10 +313,10 @@ export function DateTimeRenderer(root){
 
         if(ganttElement){
 
-          var activityElement = document.createElement("gantt-activity");
+          var activityElement = <GanttActivity>document.createElement("gantt-activity");
           activityElement.id = activity.id;
           activityElement.activity = activity;
-          activityElement.level = "day";
+          activityElement.layout = "day";
 
           ganttElement.appendChild(activityElement);
           
