@@ -3,6 +3,9 @@
 Simply Gantt is a ES6 Library to Visualize Gantt chart, it is based on Web Components so it will work on all the new browsers that support web components
 
 ```sh
+<div id="gantt"></div>
+
+
 import {simplyGantt} from "./lib/es6/index"
 
 const visualizationConfig = {
