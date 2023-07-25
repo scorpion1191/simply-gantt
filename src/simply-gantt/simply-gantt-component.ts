@@ -46,30 +46,7 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       text-align: left;
       margin-top: 10px;
     }
-    #gantt-settings{
-      display: flex;
-      align-items: center;
-      column-gap: 3px;
-      font-size:10px;
-      margin-bottom: 10px;
-    }
     </style>
-
-    <div id="gantt-settings">
-      <select name="select-layout" id="select-layout">
-        <option value="month">Month</option>
-        <option value="day">Day</option>
-      </select>
-
-      <fieldset id="select-from">
-        <legend>From</legend>
-      </fieldset>
-
-      <fieldset id="select-to">
-        <legend>To</legend>
-      </fieldset>
-
-    </div>
 
     <div id="gantt-container">
 
@@ -82,7 +59,6 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
 
     constructor() {
       super();
-
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.appendChild(template.content.cloneNode(true));
       this.layoutSelect = this.shadowRoot.querySelector('#select-layout');
@@ -114,14 +90,20 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       return this._activities;
     }
     get layout() {
-      this.layoutSelect.value = this._layout;
-      return this.layoutSelect.value;
+      return this._layout;
     }
-    set layout(newValue) {
-      this.layoutSelect.value = newValue;
-      this._layout = newValue;
+    set layout(value) {
+      this._layout = value?.type;
       if(this.renderer){
-        this.renderer.layout =  this._layout;
+        this.renderer.layout = this._layout 
+        if(this._layout == "month"){
+          this.renderer = new YearMonthRenderer(this.shadowRoot);
+        }else{
+          this.renderer = new DateTimeRenderer(this.shadowRoot);
+        } 
+        this.renderer.dateFrom = value?.formData;
+        this.renderer.dateTo = value?.toDate;
+        this.renderer.render();
       }
     } 
     get renderer(){
@@ -131,8 +113,6 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       this._renderer = r;
     }
     connectedCallback() {
-      this.changeLayout = this.changeLayout.bind(this);
-      this.layoutSelect.addEventListener('change', this.changeLayout);
       if(this.layout == "month"){
         this.renderer = new YearMonthRenderer(this.shadowRoot);
       }else{
@@ -144,28 +124,7 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
     }
 
     disconnectedCallback() {
-      if(this.layoutSelect)
-        this.layoutSelect.removeEventListener('change', this.changeLayout);
       if(this.renderer)
         this.renderer.clear();
-    }
-    changeLayout(){
-      if(this.renderer){
-        this.renderer.clear();
-      }
-      var r;
-      console.log(this.layoutSelect.value)
-      this.layout = this.layoutSelect.value;
-      if(this.layout == "month"){
-        r = new YearMonthRenderer(this.shadowRoot);
-      }else{
-        r = new DateTimeRenderer(this.shadowRoot);
-      }
-      r.dateFrom = new Date(2021,5,1);
-      r.dateTo = new Date(2021,5,24);
-      r.tasks = this.tasks;
-      r.activities = this.activities;
-      r.render();
-      this.renderer = r;
     }
   }

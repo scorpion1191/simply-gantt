@@ -4,7 +4,7 @@ export function DateTimeRenderer(root){
 
     var shadowRoot = root;
 
-    var names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+    var names = ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"];
     
     this.tasks=[];
     this.activities = [];
@@ -19,19 +19,19 @@ export function DateTimeRenderer(root){
     var dateSelectTo;
    
     var getDateFrom = function() {
-      return dateSelectFrom.value;
+      return dateSelectFrom;
     }
 
     var setDateFrom = function(newValue) {
-      dateSelectFrom.value = newValue;
+      dateSelectFrom = newValue;
     }
 
     var getDateTo = function() {
-      return dateSelectTo.value;
+      return dateSelectTo;
     }
 
     var setDateTo = function(newValue) {
-      dateSelectTo.value = newValue;
+      dateSelectTo = newValue;
     }
     
 
@@ -46,13 +46,6 @@ export function DateTimeRenderer(root){
     this.clear = function(){
 
       if(checkElements()){
-        
-        dateSelectFrom.removeEventListener('change', initGantt);
-        dateSelectFrom.remove();
-
-        dateSelectTo.removeEventListener('change', initGantt);
-        dateSelectTo.remove();
-
         var container = shadowRoot.querySelector("#gantt-container");
         container.innerHTML = "";
 
@@ -63,27 +56,10 @@ export function DateTimeRenderer(root){
     }
 
     var initSettings = function(){
-
-        if(shadowRoot){
-        shadowRoot.querySelector("#select-from").innerHTML += `
-      
-           <input type="date" id="from-select-date" name="from-select-date" min="2000/1/1" max="2050/12/31">   
-        `;
-
-        shadowRoot.querySelector("#select-to").innerHTML += `
-        
-            <input type="date" id="to-select-date" name="to-select-date"> 
-        `;
-
-        dateSelectFrom = shadowRoot.querySelector('#from-select-date');
-        dateSelectTo = shadowRoot.querySelector('#to-select-date');
-        
-        dateSelectFrom.addEventListener('change', initGantt);
-        dateSelectTo.addEventListener('change', initGantt);
-         
-        setDateFrom(`${this.dateFrom.getFullYear()}-${zeroPad(this.dateFrom.getMonth()+1)}-${zeroPad(this.dateFrom.getDate())}`);
-        setDateTo(`${this.dateTo.getFullYear()}-${zeroPad(this.dateTo.getMonth()+1)}-${zeroPad(this.dateTo.getDate())}`);
-      }
+        if(shadowRoot){         
+            setDateFrom(`${this.dateFrom.getFullYear()}-${zeroPad(this.dateFrom.getMonth()+1)}-${zeroPad(this.dateFrom.getDate())}`);
+            setDateTo(`${this.dateTo.getFullYear()}-${zeroPad(this.dateTo.getMonth()+1)}-${zeroPad(this.dateTo.getDate())}`);
+        }
     }.bind(this);
 
     var initFirstRow = function(){
@@ -234,52 +210,26 @@ export function DateTimeRenderer(root){
         activityElement.update();
       }
     }.bind(this);
-
     var initGantt = function(){
-
       if(checkElements()){
-
-        if(getDateFrom() > getDateTo()){
-
-          dateSelectFrom.style.color="red";
-          dateSelectTo.style.color="red";
-  
-        }else{
-
-          dateSelectFrom.style.color="black";
-          dateSelectTo.style.color="black";
-
-          var container = shadowRoot.querySelector("#gantt-container");
-          container.innerHTML = "";
-
-          var first_date = new Date(getDateFrom());
-          var last_date = new Date(getDateTo());
-
-          var n_Days = dayDiff(first_date, last_date) 
-      
-          container.style.gridTemplateColumns = `160px repeat(${n_Days+1},1fr)`;
-
-          initFirstRow();
-
-          initSecondRow();
-
-          initGanttRows();
-
-          initJobs();
-        }
+        var container = shadowRoot.querySelector("#gantt-container");
+        container.innerHTML = "";
+        var first_date = new Date(getDateFrom());
+        var last_date = new Date(getDateTo());
+        var n_Days = dayDiff(first_date, last_date) 
+        container.style.gridTemplateColumns = `160px repeat(${n_Days+1},1fr)`;
+        initFirstRow();
+        initSecondRow();
+        initGanttRows();
+        initJobs();
      }
   }
 
   var formatDate = function(d){
-
     return d.getFullYear()+"-"+zeroPad(d.getMonth()+1)+"-"+zeroPad(d.getDate())+"T"+zeroPad(d.getHours())+":00:00";
-    
   }
-
   var zeroPad = function(n){
-
     return n<10 ? "0"+n : n;
-
   }
 
   function dayDiff(d1, d2){

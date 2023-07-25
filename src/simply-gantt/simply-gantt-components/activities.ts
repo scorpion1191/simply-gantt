@@ -4,18 +4,18 @@ template.innerHTML =
 `<style>
     .activity{
         position: absolute;
-        height:38px;
-        top:5px;
+        height: 20px;
+        top: 15px;
         width: calc(2*100%);
         z-index: 100;
-        background-color:#1cad2d;
-        border-radius: 0px;
+        background-color:#0089ff;
+        border-radius: 6px;
         cursor: pointer;
     }
 
     .activity::after {
         content: '';
-        background-color: #646965;
+        background-color: rgba(0,0,0,0.2);;
         position: absolute;
         right: 0;
         width: 4px;
