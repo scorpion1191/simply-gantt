@@ -1,13 +1,15 @@
 import GanttActivity from "../simply-gantt-components/activities";
+import GanttEvent from "../simply-gantt-components/events";
 
-export function YearMonthRenderer(root){
+export function MonthDayRenderer(root, ganttlayout){
 
     var shadowRoot = root;
-
+    var layout = ganttlayout
     var names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     
     this.tasks=[];
     this.activities = [];
+    this.events = [];
 
     this.dateFrom = new Date();
     this.dateTo = new Date();
@@ -201,6 +203,7 @@ export function YearMonthRenderer(root){
             initSecondRow();
             initGanttRows();
             initActivities();
+            initEvents();
         }
     }
 
@@ -251,7 +254,7 @@ export function YearMonthRenderer(root){
               var activityElement = <GanttActivity>document.createElement("gantt-activity");
               activityElement.id = activity.id;
               activityElement.activity = activity;
-              activityElement.layout = "month";
+              activityElement.layout = layout;
 
               ganttElement.appendChild(activityElement);
 
@@ -278,6 +281,29 @@ export function YearMonthRenderer(root){
       }
   }.bind(this);
 
+  var initEvents = function(){
+
+    this.events.forEach(event => {
+
+        var date_string = formatDate(event.date);
+        var ganttElement = shadowRoot.querySelector(`div[data-task="${event.task}"][data-date="${date_string}"]`);
+
+        if(ganttElement){
+
+          var eventElement = <GanttEvent>document.createElement("gantt-event");
+          eventElement.id = event.id;
+          eventElement.event = event;
+          eventElement.layout = layout;
+
+          ganttElement.appendChild(eventElement);
+          
+        }
+        if(!customElements.get('gantt-event')) {
+            customElements.define('gantt-event', GanttEvent)
+        }
+    });
+    
+  }.bind(this);
 
   var makeActivitiesResizable = function(){
 

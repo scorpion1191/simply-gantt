@@ -4,12 +4,11 @@ template.innerHTML =
 `<style>
     .activity{
         position: absolute;
-        height: 20px;
-        top: 15px;
+        height: 10px;
+        bottom: 10px;
         width: calc(2*100%);
         z-index: 100;
-        background-color:#0089ff;
-        border-radius: 6px;
+        background-color:black;
         cursor: pointer;
     }
 
@@ -34,7 +33,7 @@ export default class GanttActivity extends HTMLElement {
   }
 
   _activity;
-  _layout = "month";
+  _layout = { type: "month", activity: {style: {}}};
 
   connectedCallback() {
       var activityElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
@@ -52,11 +51,17 @@ export default class GanttActivity extends HTMLElement {
   _render(){
     var jobElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
     var d;
-    if(this._layout == "month"){
+    if(this._layout?.type == "month"){
       d = this._dayDiff(this.activity.start, this.activity.end);
-    }else{//layout = "day"
+    }else if(this._layout?.type == "day"){//layout = "day"
       d = this._hourDiff(this.activity.start, this.activity.end);
+    }else{
+      d = this._monthDiff(this.activity.start, this.activity.end);
     }
+
+    let activityStyle = this.activity?.style ? this.activity?.style : {};
+    let layoutStyle = this.layout?.activity.style ? this.layout?.activity.style : {};
+    this.setActivityStyle({...layoutStyle, ...activityStyle});
     jobElement.style.width = `calc(${d*100}% + ${d}px)`;
   }
 
@@ -85,6 +90,13 @@ export default class GanttActivity extends HTMLElement {
     var diffHours = Math.ceil(diffTime / (1000 * 60 * 60)); 
     return diffHours;
   }
+
+  _monthDiff(d1, d2){
+    const monthDiff = d2.getMonth() - d1.getMonth();
+    const yearDiff = d2.getYear() - d1.getYear();
+    return (monthDiff + yearDiff * 12) + 1;
+  }
+
   set activity(newValue){
       this._activity = newValue;
       this._render();
@@ -100,6 +112,15 @@ export default class GanttActivity extends HTMLElement {
 
   get layout(){
       return this._layout;
+  }
+
+  setActivityStyle(style){
+    var activityElement = <HTMLElement>this.shadowRoot.querySelector(".activity")
+
+    for(const key in style) {
+      activityElement.style[key] = style[key]
+    }
+
   }
 }
 

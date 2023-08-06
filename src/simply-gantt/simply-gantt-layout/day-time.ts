@@ -1,6 +1,7 @@
 import GanttActivity from "../simply-gantt-components/activities";
+import GanttEvent from "../simply-gantt-components/events";
 
-export function DateTimeRenderer(root){
+export function DayTimeRenderer(root, layout){
 
     var shadowRoot = root;
 
@@ -8,6 +9,7 @@ export function DateTimeRenderer(root){
     
     this.tasks=[];
     this.activities = [];
+    this.events = [];
 
     this.selectedActivity = null;
     this.selectedActivityElement = null;
@@ -71,7 +73,7 @@ export function DateTimeRenderer(root){
         var last_date = new Date(getDateTo());
 
         var task = document.createElement("div");
-        task.className = "gantt-row-task";
+        task.className = "gantt-row-task gantt-header-one";
         container.appendChild(task);
 
         var date = new Date(first_date);
@@ -82,7 +84,7 @@ export function DateTimeRenderer(root){
             date.setHours(0);
             
             var date_period = document.createElement("div");
-            date_period.className = "gantt-row-period";
+            date_period.className = "gantt-row-period gantt-header-one";
             
             date_period.innerHTML = date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate()+" ("+names[date.getDay()]+")";
 
@@ -100,7 +102,7 @@ export function DateTimeRenderer(root){
         var last_date = new Date(getDateTo());
 
         var task = document.createElement("div");
-        task.className = "gantt-row-task";
+        task.className = "gantt-row-task gantt-header-two";
         task.style.borderTop = "none";    
         container.appendChild(task);
 
@@ -112,14 +114,14 @@ export function DateTimeRenderer(root){
             date.setHours(0);
             
             var date_period = document.createElement("div");
-            date_period.className = "gantt-row-period";
+            date_period.className = "gantt-row-period gantt-header-two";
             date_period.style.border = "none";
             container.appendChild(date_period);
 
             for(var h = 0; h<24; h++){
                 
               var period = <HTMLElement>document.createElement("div");
-              period.className = "gantt-row-period";
+              period.className = "gantt-row-period gantt-header-one";
               period.style.borderTop = "none";
               period.innerHTML = h;
               
@@ -221,7 +223,8 @@ export function DateTimeRenderer(root){
         initFirstRow();
         initSecondRow();
         initGanttRows();
-        initJobs();
+        initActivities();
+        initEvents();
      }
   }
 
@@ -254,7 +257,7 @@ export function DateTimeRenderer(root){
     return gantt_item;
   }
 
-  var initJobs = function(){
+  var initActivities = function(){
 
     this.activities.forEach(activity => {
 
@@ -266,7 +269,7 @@ export function DateTimeRenderer(root){
           var activityElement = <GanttActivity>document.createElement("gantt-activity");
           activityElement.id = activity.id;
           activityElement.activity = activity;
-          activityElement.layout = "day";
+          activityElement.layout = layout;
 
           ganttElement.appendChild(activityElement);
           
@@ -292,6 +295,34 @@ export function DateTimeRenderer(root){
         }
         if(!customElements.get('gantt-activity')) {
             customElements.define('gantt-activity', GanttActivity)
+        }
+    });
+
+    makeJobsResizable();
+    makeJobsEditable();
+    
+  }.bind(this);
+
+
+  var initEvents = function(){
+
+    this.events.forEach(event => {
+
+        var date_string = formatDate(event.date);
+        var ganttElement = shadowRoot.querySelector(`div[data-task="${event.task}"][data-date="${date_string}"]`);
+
+        if(ganttElement){
+
+          var eventElement = <GanttEvent>document.createElement("gantt-event");
+          eventElement.id = event.id;
+          eventElement.event = event;
+          eventElement.layout = layout;
+
+          ganttElement.appendChild(eventElement);
+          
+        }
+        if(!customElements.get('gantt-event')) {
+            customElements.define('gantt-event', GanttEvent)
         }
     });
 

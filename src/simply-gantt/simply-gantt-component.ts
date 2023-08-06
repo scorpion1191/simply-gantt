@@ -1,6 +1,6 @@
-import {YearMonthRenderer} from './simply-gantt-layout/month-day';
-import {DateTimeRenderer} from './simply-gantt-layout/day-time';
- 
+import {MonthDayRenderer} from './simply-gantt-layout/month-day';
+import {DayTimeRenderer} from './simply-gantt-layout/day-time';
+import {YearMonthRenderer} from './simply-gantt-layout/year-month';
   const template = document.createElement('template');
 
   template.innerHTML = 
@@ -9,6 +9,7 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
         display: grid;   
         overflow:auto;  
         position: relative;
+        height: 100%;
     }
     .gantt-row-task{
       background-color:whitesmoke;
@@ -36,6 +37,16 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
         position: relative;
         background-color:white;
         text-align:left;
+    }
+    .gantt-header-one {
+      position: sticky;
+      top: 0px;
+      z-index: 1000;
+    }
+    .gantt-header-two {
+      position: sticky;
+      top: 34px;
+      z-index: 1000;
     }
     .drag-hide {
       transition: 0.01s;
@@ -66,6 +77,7 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
 
     _tasks = [];
     _activities = [];
+    _events = [];
     _layout;
     _renderer;
 
@@ -89,20 +101,36 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
     get activities(){
       return this._activities;
     }
+
+    set events(list){
+      this._events = list;
+      if(this.renderer){
+        this.renderer.events = this._events;
+        this.renderer.render();
+      }
+    }
+    get events(){
+      return this._events;
+    }
     get layout() {
       return this._layout;
     }
     set layout(value) {
-      this._layout = value?.type;
+      this._layout = value;
       if(this.renderer){
         this.renderer.layout = this._layout 
-        if(this._layout == "month"){
-          this.renderer = new YearMonthRenderer(this.shadowRoot);
-        }else{
-          this.renderer = new DateTimeRenderer(this.shadowRoot);
+        if(this._layout.type == "year"){
+          this.renderer = new YearMonthRenderer(this.shadowRoot,this._layout);
+        }else if(this._layout.type == "day"){
+          this.renderer = new DayTimeRenderer(this.shadowRoot,this._layout);
+        } else {
+          this.renderer = new MonthDayRenderer(this.shadowRoot,this._layout);
         } 
-        this.renderer.dateFrom = value?.formData;
-        this.renderer.dateTo = value?.toDate;
+        this.renderer.dateFrom = this.getMaxandMinLayoutDates(this._layout?.fromDate, this._layout?.toDate).minDate;
+        this.renderer.dateTo = this.getMaxandMinLayoutDates(this._layout?.fromDate, this._layout?.toDate).maxDate;
+        this.renderer.activities = this._activities;
+        this.renderer.events = this._events;
+        this.renderer.tasks = this._tasks;
         this.renderer.render();
       }
     } 
@@ -113,18 +141,27 @@ import {DateTimeRenderer} from './simply-gantt-layout/day-time';
       this._renderer = r;
     }
     connectedCallback() {
-      if(this.layout == "month"){
-        this.renderer = new YearMonthRenderer(this.shadowRoot);
-      }else{
-        this.renderer = new DateTimeRenderer(this.shadowRoot);
-      } 
-      this.renderer.dateFrom = new Date(2021,5,1);
-      this.renderer.dateTo = new Date(2021,5,24);
-      this.renderer.render();
+      if(this._layout?.type == "year"){
+        this.renderer = new YearMonthRenderer(this.shadowRoot, this._layout);
+      }else if(this._layout?.type == "day"){
+        this.renderer = new DayTimeRenderer(this.shadowRoot, this._layout);
+      } else {
+        this.renderer = new MonthDayRenderer(this.shadowRoot, this._layout);
+      }    
     }
 
     disconnectedCallback() {
       if(this.renderer)
         this.renderer.clear();
+    }
+
+    getMaxandMinLayoutDates(fromDate?, toDate?){
+      let minDate;
+      let maxDate;
+      if( fromDate || toDate || this._activities.length || this.events.length) {
+        minDate = fromDate ? fromDate : [...this._activities.map((i) => i.start), ...this._events.map((i) => i.date)].reduce(function (a, b) { return a < b ? a : b; });
+        maxDate = toDate ? toDate : [...this._activities.map((i) => i.end), ...this._events.map((i) => i.date)].reduce(function (a, b) { return a > b ? a : b; });
+      }
+      return {minDate, maxDate}
     }
   }
