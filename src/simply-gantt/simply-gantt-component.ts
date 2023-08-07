@@ -10,29 +10,36 @@ import {YearMonthRenderer} from './simply-gantt-layout/year-month';
         overflow:auto;  
         position: relative;
         height: 100%;
+        margin:1em;
     }
     .gantt-row-task{
-      background-color:whitesmoke;
-      color:rgba(0, 0, 0, 0.726);
-      border:1px solid rgb(133, 129, 129);
+      background-color:#f3f4f5;
+      border:1px solid #d8d9da;
       text-align: center;
       padding: 15px;
       position: sticky;
       left: 0px;
       z-index:999;
+      font-family: sans-serif;
+      font-size: 0.9em;
+      font-weight: 600;
+      color: #797b7d;
     }
     .gantt-row-period{
-      background-color:whitesmoke;
-      color:rgba(0, 0, 0, 0.726);
-      border:1px solid rgb(133, 129, 129);
+      background-color:#f3f4f5;
+      border:1px solid #d8d9da;
       text-align: center; 
       display:grid;
       grid-auto-flow: column;
       grid-auto-columns: minmax(40px, 1fr);
       line-height:200%;
+      font-family: sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      color: #667280;
     }
     .gantt-row-item{
-        border: 1px solid rgb(214, 214, 214);
+        border: 1px solid #d8d9da;
         padding: 10px 0 10px 0;
         position: relative;
         background-color:white;
