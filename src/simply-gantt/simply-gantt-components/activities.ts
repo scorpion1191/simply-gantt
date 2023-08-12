@@ -12,6 +12,10 @@ template.innerHTML =
         cursor: pointer;
     }
 
+    .activity:hover{
+      box-shadow: 0px 2px 5px 1px;
+    }
+
     .activity::after {
         content: '';
         background-color: rgba(0,0,0,0.2);;
@@ -32,12 +36,12 @@ export default class GanttActivity extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
-  _activity;
+  _data;
   _layout = { type: "month", activity: {style: {}}};
 
   connectedCallback() {
-      var activityElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
-      activityElement.id = this.id;
+      var activityElement = <GanttActivity>this.shadowRoot.querySelector(".activity");
+      activityElement.id = "activity -" + this.id;
       activityElement.draggable = true;
       this._render();
   }
@@ -52,14 +56,14 @@ export default class GanttActivity extends HTMLElement {
     var jobElement = <HTMLElement>this.shadowRoot.querySelector(".activity");
     var d;
     if(this._layout?.type == "month"){
-      d = this._dayDiff(this.activity.start, this.activity.end);
+      d = this._dayDiff(this.data.start, this.data.end);
     }else if(this._layout?.type == "day"){//layout = "day"
-      d = this._hourDiff(this.activity.start, this.activity.end);
+      d = this._hourDiff(this.data.start, this.data.end);
     }else{
-      d = this._monthDiff(this.activity.start, this.activity.end);
+      d = this._monthDiff(this.data.start, this.data.end);
     }
 
-    let activityStyle = this.activity?.style ? this.activity?.style : {};
+    let activityStyle = this.data?.style ? this.data?.style : {};
     let layoutStyle = this.layout?.activity.style ? this.layout?.activity.style : {};
     this.setActivityStyle({...layoutStyle, ...activityStyle});
     jobElement.style.width = `calc(${d*100}% + ${d}px)`;
@@ -97,13 +101,13 @@ export default class GanttActivity extends HTMLElement {
     return (monthDiff + yearDiff * 12) + 1;
   }
 
-  set activity(newValue){
-      this._activity = newValue;
+  set data(newValue){
+      this._data = newValue;
       this._render();
   }
 
-  get activity(){
-      return this._activity;
+  get data(){
+      return this._data;
   }
 
   set layout(newValue){

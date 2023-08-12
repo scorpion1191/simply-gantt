@@ -268,7 +268,7 @@ export function DayTimeRenderer(root, layout){
 
           var activityElement = <GanttActivity>document.createElement("gantt-activity");
           activityElement.id = activity.id;
-          activityElement.activity = activity;
+          activityElement.data = activity;
           activityElement.layout = layout;
 
           ganttElement.appendChild(activityElement);
@@ -292,6 +292,13 @@ export function DayTimeRenderer(root, layout){
             gantt_item.appendChild(activityElement);
             
           });
+
+          activityElement.addEventListener("click", function() {
+            if(layout?.activity && layout.activity?.click) {
+              layout.activity.click(activity); 
+            }
+          });
+
         }
         if(!customElements.get('gantt-activity')) {
             customElements.define('gantt-activity', GanttActivity)
@@ -319,6 +326,12 @@ export function DayTimeRenderer(root, layout){
           eventElement.layout = layout;
 
           ganttElement.appendChild(eventElement);
+
+          eventElement.addEventListener("click", function() {
+            if(layout?.event && layout.event?.click) {
+              layout.activity.click(event); 
+            }
+          });
           
         }
         if(!customElements.get('gantt-event')) {

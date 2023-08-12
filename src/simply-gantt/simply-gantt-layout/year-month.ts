@@ -245,7 +245,7 @@ export function YearMonthRenderer(root, layout){
           var activityElement = <GanttActivity>document.createElement("gantt-activity");
           activityElement.layout = layout;
           activityElement.id = activity.id;
-          activityElement.activity = activity;
+          activityElement.data = activity;
 
           ganttElement.appendChild(activityElement);
           
@@ -268,6 +268,13 @@ export function YearMonthRenderer(root, layout){
             gantt_item.appendChild(activityElement);
             
           });
+
+          activityElement.addEventListener("click", function() {
+            if(layout?.activity && layout.activity?.click) {
+              layout.activity.click(activity); 
+            }
+          });
+          
         }
         if(!customElements.get('gantt-activity')) {
             customElements.define('gantt-activity', GanttActivity)

@@ -253,7 +253,7 @@ export function MonthDayRenderer(root, ganttlayout){
     
               var activityElement = <GanttActivity>document.createElement("gantt-activity");
               activityElement.id = activity.id;
-              activityElement.activity = activity;
+              activityElement.data = activity;
               activityElement.layout = layout;
 
               ganttElement.appendChild(activityElement);
@@ -272,6 +272,12 @@ export function MonthDayRenderer(root, ganttlayout){
                 var gantt_item = shadowRoot.querySelector(`div[data-task="${activity.task}"][data-date="${date_string}"]`);
                 gantt_item.appendChild(activityElement);
                 
+              });
+
+              activityElement.addEventListener("click", function() {
+                if(layout?.activity && layout.activity?.click) {
+                  layout.activity.click(activity); 
+                }
               });
             }
         });
@@ -296,6 +302,12 @@ export function MonthDayRenderer(root, ganttlayout){
           eventElement.layout = layout;
 
           ganttElement.appendChild(eventElement);
+
+          eventElement.addEventListener("click", function() {
+            if(layout?.event && layout.event?.click) {
+              layout.activity.click(event); 
+            }
+          });
           
         }
         if(!customElements.get('gantt-event')) {

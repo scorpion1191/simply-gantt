@@ -12,6 +12,9 @@ template.innerHTML =
         position: relative;
         z-index: 110;
     }
+    .event-container:hover{
+      box-shadow: 0px 2px 5px 1px;
+    }
     .event-shape{
         width: 50%;
         height: 50%;
